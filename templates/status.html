@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Status</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      text-align: center;
+    }
+
+    .status-container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 30px 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .spinner {
+      border: 6px solid #eee;
+      border-top: 6px solid #2ecc71;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .thank-you {
+      font-size: 16px;
+      color: #555;
+      margin-top: 10px;
+    }
+
+    .celebration {
+      animation: pop 0.6s ease-in-out infinite alternate;
+      font-size: 24px;
+      color: #2ecc71;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.2); }
+    }
+
+    @media (max-width: 600px) {
+      .status-container {
+        padding: 20px 15px;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+
+      p, .thank-you {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="status-container">
+  <h2>Hi {{ order['name'] }} 👋</h2>
+  <p>Your order is currently: <strong>{{ order['status'].capitalize() }}</strong></p>
+
+  {% if order['status'] == 'pending' %}
+    <div class="spinner"></div>
+    <p class="thank-you">Thank you for ordering. Please wait for 10–20 minutes 😊</p>
+
+  {% elif order['status'] == 'prepared' %}
+    <div class="celebration">🎉 Your food is prepared! 🎉</div>
+    <p class="thank-you">Thank you for waiting! Enjoy your meal 😋</p>
+  {% endif %}
+</div>
+
+<script>
+  // Auto-refresh every 10 seconds
+  setTimeout(() => {
+    window.location.reload();
+  }, 10000);
+</script>
+
+</body>
+</html>

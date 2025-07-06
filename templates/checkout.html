@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+    }
+
+    th,
+    td {
+      padding: 1rem;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+
+    button {
+      padding: 0.5rem 0.8rem;
+      background-color: #2d6cdf;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #174bb3;
+    }
+
+    .remove-btn {
+      background-color: #e74c3c;
+    }
+
+    .remove-btn:hover {
+      background-color: #c0392b;
+    }
+
+    .checkout-details label {
+      font-weight: 600;
+      display: block;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .checkout-details input,
+    .checkout-details select,
+    .checkout-details textarea {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .confirm-btn {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      background-color: #2d6cdf;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      margin-top: 1rem;
+    }
+
+    .confirm-btn:hover {
+      background-color: #174bb3;
+    }
+
+    .total-section {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
+
+    @media screen and (max-width: 600px) {
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      th {
+        display: none;
+      }
+
+      td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+      }
+
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 1rem;
+        width: 45%;
+        padding-right: 1rem;
+        text-align: left;
+        font-weight: bold;
+      }
+    }
+  </style>
+  <style>
+    .checkout-form {
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 25px 30px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .checkout-form h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    .checkout-form label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .checkout-form input[type="text"],
+    .checkout-form input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border 0.3s;
+    }
+
+    .checkout-form input:focus {
+      border-color: #0077ff;
+      outline: none;
+    }
+
+    .checkout-form button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #0066ff;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .checkout-form button:hover {
+      background-color: #0050cc;
+    }
+
+    .pay-btn {
+      background-color: #18a3ff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+  </style>
+  <style>
+    /* General Styling */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fdfdfd;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form Inputs */
+    #payment-form input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    #payment-form input:focus {
+      outline: none;
+      border-color: #0077ff;
+      box-shadow: 0 0 5px rgba(0, 119, 255, 0.2);
+    }
+
+    /* Razorpay Button */
+    #rzp-button1 {
+      width: 100%;
+      background-color: #0066ff;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #rzp-button1:hover {
+      background-color: #004acc;
+    }
+
+    /* Optional Hidden Form Styling */
+    #place-order-form {
+      display: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px 10px;
+        padding: 15px;
+      }
+
+      #rzp-button1 {
+        font-size: 15px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Your Cart</h1>
+    {% if items %}
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Subtotal</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td data-label="Item">{{ item.name }}</td>
+          <td data-label="Qty">
+            <form method="POST" style="display:inline;">
+              <input type="hidden" name="update_item" value="{{ item.id }}">
+              <input type="hidden" name="action" value="minus">
+              <button type="submit">−</button>
+            </form>
+            {{ item.qty }}
+            <form method="POST" style="display:inline;">
+              <input type="hidden" name="update_item" value="{{ item.id }}">
+              <input type="hidden" name="action" value="plus">
+              <button type="submit">+</button>
+            </form>
+          </td>
+          <td data-label="Price">₹{{ item.price }}</td>
+          <td data-label="Subtotal">₹{{ item.subtotal|round(2) }}</td>
+          <td data-label="Action">
+            <form method="POST">
+              <input type="hidden" name="update_item" value="{{ item.id }}">
+              <input type="hidden" name="action" value="remove">
+              <button type="submit" class="remove-btn">🗑 Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="total-section">
+      Total: ₹{{ total|round(2) }}
+    </div>
+
+    <div class="container">
+      <!-- Razorpay form here -->
+
+
+
+      <form id="payment-form">
+        <input type="text" id="customer_name" placeholder="Your Name" required>
+        <input type="text" id="table_number" placeholder="Table Number" required>
+        <button type="button" id="rzp-button1">💳 Pay with Razorpay</button>
+      </form>
+
+      <!-- Hidden form to place order after success -->
+      <form id="place-order-form" method="POST" action="/place_order" style="display: none;">
+        <input type="hidden" name="customer_name" id="hidden_customer_name">
+        <input type="hidden" name="table_number" id="hidden_table_number">
+        <input type="hidden" name="razorpay_payment_id" id="hidden_payment_id">
+      </form>
+    </div>
+
+
+
+    {% else %}
+    <p style="text-align: center; font-size: 1.2rem; margin-top: 2rem;">Your cart is empty!</p>
+    {% endif %}
+    <a href="{{ url_for('customer_menu') }}" style="display: block; text-align: center; margin-top: 1.5rem;">← Continue
+      Shopping</a>
+  </div>
+
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    document.getElementById('rzp-button1').onclick = async function (e) {
+      e.preventDefault();
+
+      const customerName = document.getElementById('customer_name').value.trim();
+      const tableNumber = document.getElementById('table_number').value.trim();
+
+      if (!customerName || !tableNumber) {
+        alert("Please enter your name and table number.");
+        return;
+      }
+
+      const response = await fetch('/create_order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `amount={{ total }}`
+      });
+
+      const data = await response.json();
+
+      var options = {
+        "key": data.merchant_id,
+        "amount": data.amount,
+        "currency": data.currency,
+        "name": "The Chai Story",
+        "description": "Table Order Payment",
+        "order_id": data.order_id,
+        "handler": function (response) {
+          // On successful payment, submit hidden form
+          document.getElementById('hidden_customer_name').value = customerName;
+          document.getElementById('hidden_table_number').value = tableNumber;
+          document.getElementById('hidden_payment_id').value = response.razorpay_payment_id;
+
+          document.getElementById('place-order-form').submit();
+        },
+        "theme": {
+          "color": "#0066ff"
+        }
+      };
+      var rzp1 = new Razorpay(options);
+      rzp1.open();
+    };
+  </script>
+
+</body>
+
+</html>

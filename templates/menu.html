@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Café Menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}"> -->
+</head>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #fdfdfd;
+    color: #111;
+  }
+
+  body {
+  background-image: url("{{ url_for('static', filename='back.png') }}");
+  background-repeat: repeat; /* or 'no-repeat' if it's not a pattern */
+  background-size: auto;      /* or 'cover' / 'contain' depending on your need */
+  background-attachment: fixed; /* keeps image in place */
+  background-position: center;
+}
+
+
+  .header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    gap: 15px;
+  }
+
+  .header input[type="text"] {
+    flex: 1;
+    min-width: 220px;
+    max-width: 600px;
+  }
+
+  .header-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .header-buttons {
+      justify-content: center;
+    }
+
+    .header .logo {
+      text-align: center;
+      width: 100%;
+    }
+
+    .header input[type="text"] {
+      width: 100%;
+    }
+
+    .header-buttons {
+      width: 100%;
+      justify-content: space-evenly;
+    }
+  }
+
+
+  .logo {
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .cart-btn {
+    background-color: #0066ff;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .cart-btn:hover {
+    background-color: #0050d8;
+  }
+
+  .menu-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 30px 60px;
+  }
+
+  .category-title {
+    font-size: 30px;
+    font-weight: 600;
+    margin: 40px 0 15px;
+    border-bottom: 2px solid #0077ff;
+    padding-bottom: 4px;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .menu-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+  }
+
+  .menu-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .menu-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+
+  .info {
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+  }
+
+  .info h3 {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  .desc {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0;
+    height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .price {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .add-cart {
+    background: #0066ff;
+    color: white;
+    border: none;
+    padding: 10px 0;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+  }
+
+  .add-cart:hover {
+    background: #004acc;
+  }
+
+  @media (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .menu-container {
+      padding: 0 15px 60px;
+    }
+
+    .category-title {
+      font-size: 30px;
+    }
+  }
+
+  @media (max-width: 768px) {
+  .menu-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .menu-container {
+    padding: 0 15px 60px;
+  }
+
+  .category-title {
+    font-size: 20px;
+  }
+}
+
+
+  .price-size {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .size-label {
+    font-weight: normal;
+    font-size: 14px;
+    color: #666;
+    margin-left: 6px;
+  }
+</style>
+<style>
+  #searchInput {
+    width: 89%;
+    max-width: 600px;
+    display: block;
+    /* margin: 30px auto 40px; */
+    padding: 12px 18px;
+    font-size: 16px;
+    border: 1.5px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+  }
+
+  #searchInput:focus {
+    outline: none;
+    border-color: #0077ff;
+    box-shadow: 0 0 6px rgba(0, 119, 255, 0.2);
+  }
+
+
+  .login-btn {
+    background-color: #0066ff;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .login-btn:hover {
+    background-color: #0050d8;
+  }
+</style>
+<style>
+  .login-popup {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .login-form input {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .login-form button {
+    padding: 10px;
+    font-weight: bold;
+    background-color: #0077ff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .login-form button[type="button"] {
+    background-color: #ccc;
+    color: black;
+  }
+
+  .login-btn {
+    margin-left: 10px;
+    padding: 10px 18px;
+    background-color: #111;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
+<style>
+  .logo img {
+    height: 150px;
+    object-fit: contain;
+  }
+
+  @media (max-width: 768px) {
+    .logo img {
+      height: 140px;
+    }
+  }
+</style>
+<style>
+  #splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeOut 1s ease-out 3s forwards;
+  }
+
+  #splash-screen img {
+    width: 400px;
+    height: auto;
+    animation: zoomIn 3s ease-out forwards;
+    opacity: 0;
+  }
+
+  @keyframes zoomIn {
+    0% {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+
+    40% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+</style>
+<style>
+.category-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding: 10px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.category-scroll-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.category-filters {
+  display: inline-flex;
+  gap: 10px;
+  padding: 0 10px;
+  min-width: max-content;
+}
+
+.filter-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 8px 16px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 30px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.filter-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.filter-btn.active {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+
+</style>
+
+<body>
+  <header class="header">
+    <a href="/" class="logo">
+      <img src="{{ url_for('static', filename='main.png') }}" alt="The Chai Story" />
+    </a>
+
+
+    <input type="text" id="searchInput" placeholder="🔍 Search for an item...">
+
+    <!-- Category Filter Buttons -->
+    <div class="category-scroll-wrapper">
+  <div class="category-filters" id="categoryFilters">
+    <button class="filter-btn active" onclick="filterByCategory('all', this)">All</button>
+    {% for category, _ in items|groupby("category") %}
+      <button class="filter-btn" onclick="filterByCategory('{{ category }}', this)">{{ category }}</button>
+    {% endfor %}
+  </div>
+</div>
+
+
+
+
+
+    <div class="header-buttons">
+      <button class="login-btn" onclick="toggleLogin()">🔐 Login</button>
+      <a href="{{ url_for('checkout') }}" class="cart-btn">🛒 Cart ({{ cart|length }})</a>
+    </div>
+  </header>
+
+
+  <div class="menu-container">
+    {% for category, items_in_category in items|groupby("category") %}
+    <h2 class="category-title">{{ category }}</h2>
+    <div class="menu-grid">
+      {% for item in items_in_category %}
+      <div class="menu-card">
+        <img src="{{ url_for('static', filename='uploads/' + item.image) }}" alt="{{ item.name }}">
+        <div class="info">
+          <h3>{{ item.name }}</h3>
+          <p class="desc">{{ item.description }}</p>
+          <p class="price-size">
+            ₹{{ item.price }}
+            <span class="size-label">• {{ item.size }}</span>
+          </p>
+
+          <form method="POST">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+            <input type="hidden" name="qty" value="1">
+            <button type="submit" class="add-cart">Add to Cart</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+
+  <div class="login-popup" id="loginForm">
+    <form method="POST" action="{{ url_for('admin_login') }}" class="login-form">
+      <h3>Admin Login</h3>
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <button type="button" onclick="toggleLogin()">Cancel</button>
+    </form>
+  </div>
+
+  <div id="splash-screen">
+    <img src="{{ url_for('static', filename='main.png') }}" alt="Welcome">
+  </div>
+
+
+
+
+</body>
+<script>
+  const searchInput = document.getElementById('searchInput');
+
+  searchInput.addEventListener('input', function () {
+    const query = this.value.toLowerCase().trim();
+    const allGrids = document.querySelectorAll('.menu-grid');
+    const allTitles = document.querySelectorAll('.category-title');
+
+    // Hide all original items
+    allGrids.forEach(grid => grid.style.display = 'none');
+    allTitles.forEach(title => title.style.display = 'none');
+
+    // Remove old search results section if it exists
+    let existingResults = document.getElementById('search-results');
+    if (existingResults) existingResults.remove();
+
+    if (query === "") {
+      // Show everything again
+      allGrids.forEach(grid => grid.style.display = '');
+      allTitles.forEach(title => title.style.display = '');
+      return;
+    }
+
+    const resultGrid = document.createElement('div');
+    resultGrid.className = 'menu-grid';
+    resultGrid.id = 'search-results';
+    const container = document.querySelector('.menu-container');
+    container.insertBefore(resultGrid, container.children[1]);
+
+    const cards = document.querySelectorAll('.menu-card');
+    let found = 0;
+
+    cards.forEach(card => {
+      const name = card.querySelector('h3').textContent.toLowerCase();
+      if (name.includes(query)) {
+        resultGrid.appendChild(card.cloneNode(true));
+        found++;
+      }
+    });
+
+    if (found === 0) {
+      resultGrid.innerHTML = "<p style='grid-column: 1 / -1; text-align:center;'>No matching items found.</p>";
+    }
+  });
+</script>
+<script>
+  function toggleLogin() {
+    const form = document.getElementById("loginForm");
+    form.style.display = (form.style.display === "block") ? "none" : "block";
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const splash = document.getElementById('splash-screen');
+
+    if (sessionStorage.getItem('splashShown')) {
+      // Splash has already shown this session
+      if (splash) splash.remove();
+    } else {
+      // First time this session — show splash, then remove
+      sessionStorage.setItem('splashShown', 'true');
+      setTimeout(() => {
+        if (splash) splash.remove();
+      }, 4000); // 4 seconds
+    }
+  });
+</script>
+<script>
+  function filterByCategory(selectedCategory, btn) {
+    const allGrids = document.querySelectorAll('.menu-grid');
+    const allTitles = document.querySelectorAll('.category-title');
+
+    // Set active class on selected button
+    const allButtons = document.querySelectorAll('.filter-btn');
+    allButtons.forEach(button => button.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    if (selectedCategory === 'all') {
+      allGrids.forEach(grid => grid.style.display = '');
+      allTitles.forEach(title => title.style.display = '');
+      return;
+    }
+
+    allTitles.forEach((title, index) => {
+      const categoryText = title.textContent.trim();
+      const grid = allGrids[index];
+
+      if (categoryText === selectedCategory) {
+        title.style.display = '';
+        grid.style.display = '';
+      } else {
+        title.style.display = 'none';
+        grid.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+
+
+</html>

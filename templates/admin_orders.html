@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Pending Orders</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    .filters {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .filters a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #0d6efd;
+      font-weight: bold;
+      padding: 8px 16px;
+      border: 1px solid #0d6efd;
+      border-radius: 6px;
+      transition: 0.2s ease;
+    }
+
+    .filters a.active,
+    .filters a:hover {
+      background-color: #0d6efd;
+      color: white;
+    }
+
+    .orders-table {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background-color: #0d6efd;
+      color: #fff;
+    }
+
+    th,
+    td {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    tbody tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    td:last-child {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #fff;
+      transition: 0.2s ease-in-out;
+    }
+
+    button[name="action"][value="accept"] {
+      background-color: #28a745;
+    }
+
+    button[name="action"][value="reject"] {
+      background-color: #dc3545;
+    }
+
+    button[name="action"][value="prepare"] {
+      background-color: #17a2b8;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    .accepted {
+      background-color: #c7eed8 !important;
+    }
+
+    .rejected {
+      background-color: #f5c6cb !important;
+    }
+
+    .prepared {
+      background-color: #cce5ff !important;
+    }
+
+    @media (max-width: 768px) {
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        background: #fff;
+        margin-bottom: 12px;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed #ccc;
+      }
+
+      td:last-child {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        border-bottom: none;
+      }
+    }
+  </style>
+
+  <style>
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 10px 0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .back-button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #0056b3;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        margin: 0 20px;
+        gap: 10px;
+      }
+
+      .button-group {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 10px;
+      }
+
+      .back-button {
+        width: auto;
+        padding: 10px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-bar" style="margin-left: 150px; margin-right: 150px;">
+    <h1>📦 Admin Order Panel</h1>
+    <div class="button-group">
+      <a href="{{ url_for('admin') }}" class="back-button">View Menu</a>
+      <a href="{{ url_for('customer_menu') }}" class="back-button">Customer Page</a>
+    </div>
+  </div>
+
+
+  <div class="filters">
+    {% set filters = ['all', 'prepared'] %}
+    {% for f in filters %}
+    <a href="{{ url_for('admin_orders', filter=(f if f != 'all' else None)) }}"
+      class="{{ 'active' if current_filter == f or (f == 'all' and not current_filter) else '' }}">
+      {{ f.capitalize() }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <div class="orders-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Table</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr class="{{ order['status'] }}">
+          <td>{{ order['name'] }}</td>
+          <td>{{ order['order_type'] }}</td>
+          <td>{{ order['items'] }}</td>
+          <td>₹{{ '%.2f'|format(order['total']) }}</td>
+          <td>{{ order['status'].capitalize() }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('update_order', order_id=order['id']) }}">
+              <button name="action" value="prepare">Mark Prepared</button>
+            </form>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    setInterval(() => {
+      window.location.reload();
+    }, 5000); // refresh every 5 seconds
+  </script>
+
+
+</body>
+
+</html>
