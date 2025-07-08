@@ -167,12 +167,31 @@ def order_status(customer):
     order = conn.execute("""
         SELECT * FROM orders WHERE name = ? ORDER BY timestamp DESC LIMIT 1
     """, (customer,)).fetchone()
+
+    parsed_items = []
+    if order:
+        for item_string in order['items'].split(';'):
+            item_string = item_string.strip()
+            if ' x ' in item_string:
+                name, qty = item_string.split(' x ')
+                menu_item = conn.execute("SELECT * FROM menu_items WHERE name = ?", (name.strip(),)).fetchone()
+                if menu_item:
+                    price = float(menu_item['price'])
+                    subtotal = price * int(qty)
+                    parsed_items.append({
+                        'name': name.strip(),
+                        'qty': int(qty),
+                        'price': price,
+                        'subtotal': subtotal
+                    })
+
     conn.close()
 
     if not order:
         return "Order not found"
 
-    return render_template('status.html', order=order)
+    return render_template('status.html', order=order, parsed_items=parsed_items)
+
 
 @app.route('/admin/orders')
 def admin_orders():

@@ -91,9 +91,32 @@
     <p class="thank-you">Thank you for ordering. Please wait for 10–20 minutes 😊</p>
 
   {% elif order['status'] == 'prepared' %}
-    <div class="celebration">🎉 Your food is prepared! 🎉</div>
-    <p class="thank-you">Thank you for waiting! Enjoy your meal 😋</p>
-  {% endif %}
+  <div class="celebration">🎉 Your food is prepared! 🎉</div>
+
+  <table style="width:100%; margin: 20px 0; border-collapse: collapse;">
+    <thead>
+      <tr style="background-color: #f0f0f0;">
+        <th style="padding: 10px; border: 1px solid #ddd;">Item</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Qty</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Price</th>
+        <th style="padding: 10px; border: 1px solid #ddd;">Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in parsed_items %}
+      <tr>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{ item.name }}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">{{ item.qty }}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">₹{{ '%.2f'|format(item.price) }}</td>
+        <td style="padding: 10px; border: 1px solid #ddd;">₹{{ '%.2f'|format(item.subtotal) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="thank-you">Thank you for waiting! Enjoy your meal 😋</p>
+{% endif %}
+
 </div>
 
 <script>
