@@ -7,13 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-secret_key = os.getenv('SECRET_KEY')
-secret_auth = os.getenv('SECRET_AUTH')
 password_Admin = os.getenv('password')
-
-
-# Add this before app.run() or inside __name__ block
-razorpay_client = razorpay.Client(auth=(secret_auth, secret_key))
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -31,10 +25,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS menu_items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        description TEXT,
         price REAL NOT NULL,
         category TEXT,
-        size TEXT,
         image TEXT
     )
     ''')
@@ -61,10 +53,8 @@ def admin():
     if request.method == 'POST':
         if 'add' in request.form:
             name = request.form['name']
-            desc = request.form['description']
             price = float(request.form['price'])
             category = request.form['category']
-            size = request.form['size']
 
             image_file = request.files['image']
             image_filename = ""
@@ -74,9 +64,9 @@ def admin():
                 image_file.save(image_path)
 
             conn.execute("""
-                INSERT INTO menu_items (name, description, price, category, size, image)
-                VALUES (?, ?, ?, ?, ?, ?)""",
-                (name, desc, price, category, size, image_filename))
+                INSERT INTO menu_items (name, price, category, image)
+                VALUES (?, ?, ?, ?)""",
+                (name, price, category, image_filename))
             conn.commit()
 
         elif 'delete' in request.form:
@@ -138,7 +128,7 @@ def checkout():
             total += row['subtotal']
     conn.close()
 
-    if request.method == 'POST' and 'place_order' in request.form:
+    if request.method == 'POST':
         name = request.form.get('customer_name', '').strip()
         table_number = request.form.get('table_number', '').strip()
 
@@ -158,6 +148,7 @@ def checkout():
 
         session.pop('cart', None)
         return redirect(url_for('order_status', customer=name))
+
 
     return render_template('checkout.html', items=items, total=total)
 
@@ -238,29 +229,14 @@ def admin_login():
         return redirect(url_for('admin'))
     else:
         return "Invalid credentials", 401
-    
-@app.route('/create_order', methods=['POST'])
-def create_order():
-    amount = int(float(request.form['amount']) * 100)
-    order = razorpay_client.order.create({
-        'amount': amount,
-        'currency': 'INR',
-        'payment_capture': '1'
-    })
-    return {
-        'order_id': order['id'],
-        'amount': amount,
-        'currency': 'INR',
-        'merchant_id': secret_auth
-    }
+
 
 @app.route('/place_order', methods=['POST'])
 def place_order():
     name = request.form.get('customer_name')
     table_number = request.form.get('table_number')
-    payment_id = request.form.get('razorpay_payment_id')
 
-    if not all([name, table_number, payment_id]):
+    if not all([name, table_number]):
         return "Missing required fields", 400
 
     cart = session.get('cart', {})
@@ -288,6 +264,7 @@ def place_order():
 
     session.pop('cart', None)
     return redirect(url_for('order_status', customer=name))
+
 
 
 

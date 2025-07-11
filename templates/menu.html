@@ -451,10 +451,8 @@
         <img src="{{ url_for('static', filename='uploads/' + item.image) }}" alt="{{ item.name }}">
         <div class="info">
           <h3>{{ item.name }}</h3>
-          <p class="desc">{{ item.description }}</p>
           <p class="price-size">
             ₹{{ item.price }}
-            <span class="size-label">• {{ item.size }}</span>
           </p>
 
           <form method="POST">

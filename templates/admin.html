@@ -191,10 +191,8 @@
     <form method="POST" enctype="multipart/form-data" class="add-form">
       <h2 style="width: 100%; text-align: center;">Add New Item</h2>
       <input type="text" name="name" placeholder="Item Name" required>
-      <input type="text" name="description" placeholder="Description">
       <input type="number" name="price" placeholder="Price" step="0.01" required>
       <input type="text" name="category" placeholder="Category">
-      <input type="text" name="size" placeholder="Size (e.g., Small)">
       <input type="file" name="image" accept="image/*">
       <button type="submit" name="add">Add Item</button>
     </form>
@@ -213,10 +211,8 @@
           No Image</div>
         {% endif %}
         <h3>{{ item.name }}</h3>
-        <p>{{ item.description or 'No description' }}</p>
         <p class="price">₹{{ item.price }}</p>
         <p>Category: {{ item.category }}</p>
-        <p>Size: {{ item.size }}</p>
         <form method="POST">
           <button type="submit" name="delete" value="{{ item.id }}"
             onclick="return confirm('Delete this item?')">Delete</button>
