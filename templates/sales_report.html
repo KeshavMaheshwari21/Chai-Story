@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Report</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 10px;
+    }
+
+    .top-actions a {
+      display: inline-block;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-left: 10px;
+      transition: background-color 0.3s;
+      font-size: 14px;
+    }
+
+    .top-actions a:hover {
+      background-color: #0056b3;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    .filters {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .filters a {
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #0066cc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #f2f2f2;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .total {
+      text-align: right;
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- Top right buttons -->
+    <div class="top-actions">
+      <a href="{{ url_for('admin') }}">View Menu</a>
+      <a href="{{ url_for('admin_orders') }}">View Orders</a>
+      <a href="{{ url_for('customer_menu') }}">Customer Page</a>
+      <a href="{{ url_for('sales_report') }}">Report</a>
+    </div>
+
+    <h2>Sales Report - {{ filter_type|capitalize }}</h2>
+
+    <div class="filters">
+      <a href="{{ url_for('sales_report', filter='daily') }}">Daily</a> |
+      <a href="{{ url_for('sales_report', filter='weekly') }}">Weekly</a> |
+      <a href="{{ url_for('sales_report', filter='monthly') }}">Monthly</a> |
+      <a href="{{ url_for('sales_report', filter='yearly') }}">Yearly</a> |
+      <a href="{{ url_for('sales_report', filter='all') }}">All</a>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>{{ filter_type|capitalize }}</th>
+          <th>Total Sales (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+        <tr>
+          <td>{{ row.label }}</td>
+          <td>₹{{ row.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="total">
+      Total Sales: ₹{{ total_sales }}
+    </div>
+  </div>
+</body>
+
+</html>

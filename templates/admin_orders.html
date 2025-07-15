@@ -203,6 +203,31 @@
         font-size: 14px;
       }
     }
+
+    tr.preparing {
+      background-color: #f8d7da;
+      /* light red */
+    }
+
+    tr.prepared {
+      background-color: #cce5ff;
+      /* light blue */
+    }
+    button[name="action"][value="prepared"] {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+button[name="action"][value="prepared"]:hover {
+  background-color: #0056b3;
+}
+
   </style>
 </head>
 
@@ -212,13 +237,16 @@
     <h1>📦 Admin Order Panel</h1>
     <div class="button-group">
       <a href="{{ url_for('admin') }}" class="back-button">View Menu</a>
+      <a href="{{ url_for('admin_orders') }}" class="back-button">View Orders</a>
       <a href="{{ url_for('customer_menu') }}" class="back-button">Customer Page</a>
+      <a href="{{ url_for('sales_report') }}" class="back-button">Report</a>
+
     </div>
   </div>
 
 
   <div class="filters">
-    {% set filters = ['all', 'prepared'] %}
+    {% set filters = ['all','preparing', 'prepared'] %}
     {% for f in filters %}
     <a href="{{ url_for('admin_orders', filter=(f if f != 'all' else None)) }}"
       class="{{ 'active' if current_filter == f or (f == 'all' and not current_filter) else '' }}">
@@ -248,10 +276,18 @@
           <td>₹{{ '%.2f'|format(order['total']) }}</td>
           <td>{{ order['status'].capitalize() }}</td>
           <td>
+            {% if order['status'] == 'pending' %}
             <form method="POST" action="{{ url_for('update_order', order_id=order['id']) }}">
-              <button name="action" value="prepare">Mark Prepared</button>
+              <button name="action" value="prepare">Prepare</button>
             </form>
+            {% elif order['status'] == 'preparing' %}
+            <form method="POST" action="{{ url_for('update_order', order_id=order['id']) }}">
+              <button name="action" value="prepared">Mark Prepared</button>
+            </form>
+            {% endif %}
           </td>
+
+
 
         </tr>
         {% endfor %}

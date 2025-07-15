@@ -90,6 +90,10 @@
     <div class="spinner"></div>
     <p class="thank-you">Thank you for ordering. Please wait for 10–20 minutes 😊</p>
 
+  {% elif order['status'] == 'preparing' %}
+  <div class="spinner"></div>
+  <div class="thank-you">Your food is preparing!</div>
+  
   {% elif order['status'] == 'prepared' %}
   <div class="celebration">🎉 Your food is prepared! 🎉</div>
 

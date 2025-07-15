@@ -1,3 +1,5 @@
+from collections import defaultdict
+from datetime import datetime, timedelta
 import os
 import sqlite3
 from werkzeug.utils import secure_filename
@@ -43,6 +45,15 @@ def init_db():
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     ''')
+
+    conn.execute('''
+    CREATE TABLE IF NOT EXISTS report (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        price REAL NOT NULL,
+        date TEXT DEFAULT (DATE('now'))
+    )
+    ''')
+
 
     conn.commit()
     conn.close()
@@ -188,7 +199,7 @@ def order_status(customer):
 def admin_orders():
     filter_status = request.args.get('filter')
     conn = get_db_connection()
-    if filter_status in ['pending', 'accepted', 'rejected', 'prepared']:
+    if filter_status in ['pending', 'accepted', 'rejected', 'prepared', 'preparing']:
         orders = conn.execute(
             "SELECT * FROM orders WHERE status = ? ORDER BY timestamp DESC",
             (filter_status,)
@@ -198,16 +209,17 @@ def admin_orders():
     conn.close()
     return render_template('admin_orders.html', orders=orders, current_filter=filter_status)
 
+
 @app.route('/admin/update/<int:order_id>', methods=['POST'])
 def update_order(order_id):
     action = request.form['action']
 
-    if action == 'accept':
-        new_status = 'accepted'
+    if action == 'accept' or action == 'prepare':
+        new_status = 'preparing'
+    elif action == 'prepared':
+        new_status = 'prepared'
     elif action == 'reject':
         new_status = 'rejected'
-    elif action == 'prepare':
-        new_status = 'prepared'
     else:
         return redirect(url_for('admin_orders'))
 
@@ -217,6 +229,7 @@ def update_order(order_id):
     conn.close()
 
     return redirect(url_for('admin_orders'))
+
 
 @app.route('/admin_login', methods=['POST'])
 def admin_login():
@@ -259,11 +272,95 @@ def place_order():
         VALUES (?, ?, ?, ?, ?, 'pending')
     """, (name, table_number, f'Table {table_number}', item_string, total))
 
+    conn.execute("INSERT INTO report (price) VALUES (?)", (total,))
+
     conn.commit()
     conn.close()
 
     session.pop('cart', None)
     return redirect(url_for('order_status', customer=name))
+
+
+@app.route('/admin/sales_report')
+def sales_report():
+    filter_type = request.args.get('filter', 'all')
+    conn = get_db_connection()
+
+    if filter_type == 'daily':
+        query = "SELECT date, SUM(price) as total FROM report GROUP BY date ORDER BY date DESC"
+
+    elif filter_type == 'weekly':
+        query = """
+        SELECT 
+            strftime('%Y', date) as year,
+            strftime('%W', date) as week,
+            strftime('%m', date) as month,
+            SUM(price) as total
+        FROM report
+        GROUP BY year, week
+        ORDER BY year DESC, week DESC
+        """
+
+    elif filter_type == 'monthly':
+        query = """
+        SELECT 
+            strftime('%Y', date) as year,
+            strftime('%m', date) as month,
+            SUM(price) as total
+        FROM report
+        GROUP BY year, month
+        ORDER BY year DESC, month DESC
+        """
+
+    elif filter_type == 'yearly':
+        query = """
+        SELECT 
+            strftime('%Y', date) as year,
+            SUM(price) as total
+        FROM report
+        GROUP BY year
+        ORDER BY year DESC
+        """
+    else:
+        query = "SELECT date, SUM(price) as total FROM report GROUP BY date ORDER BY date DESC"
+
+    rows = conn.execute(query).fetchall()
+    conn.close()
+
+    # Format results for the template
+    formatted_data = []
+
+    if filter_type == 'daily' or filter_type == 'all':
+        for row in rows:
+            raw_date = datetime.strptime(row['date'], '%Y-%m-%d')
+            formatted_date = raw_date.strftime('%d-%m-%y')
+            formatted_data.append({
+                'label': formatted_date,
+                'total': row['total']
+            })
+
+
+    elif filter_type == 'weekly':
+        for row in rows:
+            month_name = datetime.strptime(row['month'], '%m').strftime('%B')
+            week_number = int(row['week']) + 1  # SQLite week starts from 0
+            label = f"Week {week_number} - {month_name} {row['year']}"
+            formatted_data.append({'label': label, 'total': row['total']})
+
+    elif filter_type == 'monthly':
+        for row in rows:
+            month_name = datetime.strptime(row['month'], '%m').strftime('%B')
+            label = f"{month_name} {row['year']}"
+            formatted_data.append({'label': label, 'total': row['total']})
+
+    elif filter_type == 'yearly':
+        for row in rows:
+            label = f"{row['year']}"
+            formatted_data.append({'label': label, 'total': row['total']})
+
+    total_sales = sum(row['total'] for row in formatted_data)
+
+    return render_template('sales_report.html', data=formatted_data, total_sales=total_sales, filter_type=filter_type)
 
 
 
