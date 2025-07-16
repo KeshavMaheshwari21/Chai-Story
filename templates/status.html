@@ -5,80 +5,128 @@
   <title>Order Status</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-      text-align: center;
-    }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f2f0ed; /* Coffee cream background */
+    margin: 0;
+    padding: 20px;
+    color: #3e2a1e;
+    text-align: center;
+  }
 
+  .status-container {
+    max-width: 520px;
+    margin: auto;
+    background: #fcf9f7; /* Latte foam */
+    padding: 30px 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    font-size: 26px;
+    margin-bottom: 12px;
+    color: #4e342e;
+  }
+
+  p {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .spinner {
+    border: 6px solid #e0d8cc;
+    border-top: 6px solid #6d4c41;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .thank-you {
+    font-size: 16px;
+    color: #5a4636;
+    margin-top: 10px;
+  }
+
+  .celebration {
+    animation: pop 0.6s ease-in-out infinite alternate;
+    font-size: 24px;
+    color: #6d4c41;
+    margin: 10px 0 20px;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.2); }
+  }
+
+  table {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: collapse;
+    font-size: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 10px;
+    border: 1px solid #d8cfc5;
+  }
+
+  th {
+    background-color: #a1887f;
+    color: white;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f7f4f1;
+  }
+
+  .back-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 24px;
+    background-color: #6d4c41;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+
+  .back-btn:hover {
+    background-color: #4e342e;
+  }
+
+  @media (max-width: 600px) {
     .status-container {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 30px 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      padding: 20px 15px;
     }
 
     h2 {
-      font-size: 26px;
-      margin-bottom: 10px;
+      font-size: 22px;
     }
 
-    p {
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-
-    .spinner {
-      border: 6px solid #eee;
-      border-top: 6px solid #2ecc71;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .thank-you {
+    p, .thank-you {
       font-size: 16px;
-      color: #555;
-      margin-top: 10px;
     }
 
-    .celebration {
-      animation: pop 0.6s ease-in-out infinite alternate;
-      font-size: 24px;
-      color: #2ecc71;
+    table {
+      font-size: 14px;
     }
+  }
+</style>
 
-    @keyframes pop {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.2); }
-    }
-
-    @media (max-width: 600px) {
-      .status-container {
-        padding: 20px 15px;
-      }
-
-      h2 {
-        font-size: 22px;
-      }
-
-      p, .thank-you {
-        font-size: 16px;
-      }
-    }
-  </style>
 </head>
 <body>
 
@@ -91,40 +139,41 @@
     <p class="thank-you">Thank you for ordering. Please wait for 10–20 minutes 😊</p>
 
   {% elif order['status'] == 'preparing' %}
-  <div class="spinner"></div>
-  <div class="thank-you">Your food is preparing!</div>
-  
+    <div class="spinner"></div>
+    <div class="thank-you">Your food is preparing!</div>
+
   {% elif order['status'] == 'prepared' %}
-  <div class="celebration">🎉 Your food is prepared! 🎉</div>
+    <div class="celebration">🎉 Your food is prepared! 🎉</div>
 
-  <table style="width:100%; margin: 20px 0; border-collapse: collapse;">
-    <thead>
-      <tr style="background-color: #f0f0f0;">
-        <th style="padding: 10px; border: 1px solid #ddd;">Item</th>
-        <th style="padding: 10px; border: 1px solid #ddd;">Qty</th>
-        <th style="padding: 10px; border: 1px solid #ddd;">Price</th>
-        <th style="padding: 10px; border: 1px solid #ddd;">Subtotal</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in parsed_items %}
-      <tr>
-        <td style="padding: 10px; border: 1px solid #ddd;">{{ item.name }}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">{{ item.qty }}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">₹{{ '%.2f'|format(item.price) }}</td>
-        <td style="padding: 10px; border: 1px solid #ddd;">₹{{ '%.2f'|format(item.subtotal) }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in parsed_items %}
+        <tr>
+          <td>{{ item.name }}</td>
+          <td>{{ item.qty }}</td>
+          <td>₹{{ '%.2f'|format(item.price) }}</td>
+          <td>₹{{ '%.2f'|format(item.subtotal) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  <p class="thank-you">Thank you for waiting! Enjoy your meal 😋</p>
-{% endif %}
+    <p class="thank-you">Thank you for waiting! Enjoy your meal 😋</p>
 
+    <a href="{{ url_for('customer_menu') }}" class="back-btn">← Back to Menu</a>
+  {% endif %}
 </div>
 
 <script>
-  // Auto-refresh every 10 seconds
+  // Auto-refresh every 10 seconds to update status
   setTimeout(() => {
     window.location.reload();
   }, 10000);
